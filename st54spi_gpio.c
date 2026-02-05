@@ -68,7 +68,7 @@ struct st54spi_gpio_device {
  *
  *  @return 0 on success, error code for failures.
  */
-long st54spi_gpio_dev_ioctl(struct file *pfile, unsigned int cmd, unsigned long arg)
+static long st54spi_gpio_dev_ioctl(struct file *pfile, unsigned int cmd, unsigned long arg)
 {
 	int ret = 0;
 	struct st54spi_gpio_device *st54spi_gpio_dev = pfile->private_data;
