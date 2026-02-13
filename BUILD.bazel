@@ -11,3 +11,6 @@ define_modules("canoe", "perf")
 
 define_modules("vienna", "consolidate")
 define_modules("vienna", "perf")
+
+define_modules("malabar", "consolidate")
+define_modules("malabar", "perf")
