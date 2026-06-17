@@ -17,3 +17,7 @@ define_modules("malabar", "perf")
 
 define_modules("shikra", "consolidate")
 define_modules("shikra", "perf")
+
+define_modules("autogvm", "consolidate")
+define_modules("autogvm", "perf")
+
