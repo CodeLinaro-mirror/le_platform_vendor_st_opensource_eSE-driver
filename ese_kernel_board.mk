@@ -10,7 +10,7 @@ else
 endif
 
 # Target specific build rules
-ifeq ($(call is-board-platform-in-list, pineapple sun canoe vienna chora malabar),true)
+ifeq ($(call is-board-platform-in-list, pineapple sun canoe vienna chora malabar shikra),true)
   ifeq ($(ESE_DLKM_ENABLED), true)
     TARGET_USES_ST_ESE :=true
     BOARD_VENDOR_KERNEL_MODULES += $(KERNEL_MODULES_OUT)/stm_st54se_gpio.ko
