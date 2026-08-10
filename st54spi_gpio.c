@@ -232,8 +232,12 @@ static int st54spi_gpio_probe(struct platform_device *pdev)
 	/* Setup gpio-power_nreset */
 	st54spi_gpio_dev->gpiod_reset = of_get_named_gpio(np, "gpio-power_nreset", 0);
 	if (!gpio_is_valid(st54spi_gpio_dev->gpiod_reset)) {
-		pr_err("%s : Unable to request gpio-power_nreset\n", __func__);
-		rc = -EFAULT;
+		if (st54spi_gpio_dev->gpiod_reset == -EPROBE_DEFER) {
+			rc = -EPROBE_DEFER;
+		} else {
+			pr_err("%s : Unable to request gpio-power_nreset\n", __func__);
+			rc = -EFAULT;
+		}
 		goto fail_gpiod_get;
 	}
 
