@@ -48,7 +48,8 @@
 #define ST54SPI_RESET_GPIO	_IOW(ST54SPI_GPIO__MAGIC, 0x03, unsigned int)
 
 // define pulses time express in msec
-#define HARD_RESET_TIME_PULSE 10
+#define HARD_RESET_LOW_PULSE_MS  3  /* nRESET low duration */
+#define HARD_RESET_TIME_PULSE   10  /* min delay after nRESET high before first SPI */
 
 struct st54spi_gpio_device {
 	dev_t st54spi_gpio_dev_t;
@@ -104,8 +105,9 @@ static long st54spi_gpio_dev_ioctl(struct file *pfile, unsigned int cmd, unsigne
 	case ST54SPI_RESET_GPIO:
 		pr_info("ST54SPI_RESET_GPIO\n");
 		gpio_set_value(st54spi_gpio_dev->gpiod_reset, 0);
-		msleep(HARD_RESET_TIME_PULSE);
+		msleep(HARD_RESET_LOW_PULSE_MS);
 		gpio_set_value(st54spi_gpio_dev->gpiod_reset, 1);
+		msleep(HARD_RESET_TIME_PULSE);
 		break;
 	default:
 		pr_err("%s Unsupported ioctl cmd 0x%x, arg %lu\n",
