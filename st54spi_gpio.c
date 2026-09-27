@@ -122,14 +122,17 @@ static int st54spi_gpio_dev_open(struct inode *inode, struct file *pfile)
 #ifdef ESE_CONF_GPIO_OPEN_RELEASE
 	int rc;
 #endif
-	struct st54spi_gpio_device *st54spi_gpio_dev = container_of(inode->i_cdev,
-					struct st54spi_gpio_device, c_dev);
+	struct st54spi_gpio_device *st54spi_gpio_dev;
 
-	pr_debug("%s : Device File Opened\n", __func__);
-	if (!st54spi_gpio_dev) {
+	if (!inode->i_cdev) {
 		pr_err("%s ENODEV NULL\n", __func__);
 		return -ENODEV;
 	}
+
+	st54spi_gpio_dev = container_of(inode->i_cdev,
+					struct st54spi_gpio_device, c_dev);
+
+	pr_debug("%s : Device File Opened\n", __func__);
 #ifdef ESE_CONF_GPIO_OPEN_RELEASE
 	rc = gpio_request(st54spi_gpio_dev->gpiod_reset, "gpio-power_nreset");
 	if (rc < 0) {
@@ -156,7 +159,7 @@ static int st54spi_gpio_dev_release(struct inode *inode, struct file *pfile)
 #ifdef ESE_CONF_GPIO_OPEN_RELEASE
 	struct st54spi_gpio_device *st54spi_gpio_dev = pfile->private_data;
 
-	if (gpio_is_valid(st54spi_gpio_dev->gpiod_reset))
+	if (st54spi_gpio_dev && gpio_is_valid(st54spi_gpio_dev->gpiod_reset))
 		gpio_free(st54spi_gpio_dev->gpiod_reset);
 #endif
 	pr_debug("%s: Device File Closed\n", __func__);
@@ -291,12 +294,13 @@ static void st54spi_gpio_remove(struct platform_device *pdev)
 	unregister_chrdev_region(st54spi_gpio_dev->st54spi_gpio_dev_t, 1);
 	class_destroy(st54spi_gpio_dev->class);
 	cdev_del(&st54spi_gpio_dev->c_dev);
-	devm_kfree(dev, st54spi_gpio_dev);
-	dev_set_drvdata(dev, NULL);
 #ifdef ESE_CONF_GPIO_PROBE_REMOVE
 	if (gpio_is_valid(st54spi_gpio_dev->gpiod_reset))
 		gpio_free(st54spi_gpio_dev->gpiod_reset);
 #endif
+
+	devm_kfree(dev, st54spi_gpio_dev);
+	dev_set_drvdata(dev, NULL);
 
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(6, 10, 0))
 	return 0;
