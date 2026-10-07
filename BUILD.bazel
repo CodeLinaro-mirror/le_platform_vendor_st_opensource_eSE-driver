@@ -17,3 +17,6 @@ define_modules("art", "perf")
 
 define_modules("art16k", "consolidate")
 define_modules("art16k", "perf")
+
+define_modules("autogvm", "consolidate")
+define_modules("autogvm", "perf")
