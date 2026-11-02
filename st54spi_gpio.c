@@ -235,8 +235,12 @@ static int st54spi_gpio_probe(struct platform_device *pdev)
 	/* Setup gpio-power_nreset */
 	st54spi_gpio_dev->gpiod_reset = of_get_named_gpio(np, "gpio-power_nreset", 0);
 	if (!gpio_is_valid(st54spi_gpio_dev->gpiod_reset)) {
-		pr_err("%s : Unable to request gpio-power_nreset\n", __func__);
-		rc = -EFAULT;
+		if (st54spi_gpio_dev->gpiod_reset == -EPROBE_DEFER) {
+			rc = -EPROBE_DEFER;
+		} else {
+			pr_err("%s : Unable to request gpio-power_nreset\n", __func__);
+			rc = -EFAULT;
+		}
 		goto fail_gpiod_get;
 	}
 
@@ -294,12 +298,13 @@ static void st54spi_gpio_remove(struct platform_device *pdev)
 	unregister_chrdev_region(st54spi_gpio_dev->st54spi_gpio_dev_t, 1);
 	class_destroy(st54spi_gpio_dev->class);
 	cdev_del(&st54spi_gpio_dev->c_dev);
-	devm_kfree(dev, st54spi_gpio_dev);
-	dev_set_drvdata(dev, NULL);
 #ifdef ESE_CONF_GPIO_PROBE_REMOVE
 	if (gpio_is_valid(st54spi_gpio_dev->gpiod_reset))
 		gpio_free(st54spi_gpio_dev->gpiod_reset);
 #endif
+
+	devm_kfree(dev, st54spi_gpio_dev);
+	dev_set_drvdata(dev, NULL);
 
 #if (LINUX_VERSION_CODE < KERNEL_VERSION(6, 10, 0))
 	return 0;
